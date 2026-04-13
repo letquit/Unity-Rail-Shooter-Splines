@@ -11,16 +11,20 @@ namespace RailShooter
         [SerializeField, Self] private InputReader input;
         
         [SerializeField] private Transform followTarget;
+        [SerializeField] private Transform aimTarget;
+        
         [SerializeField] private Transform playerModel;
         [SerializeField] private float followDistance = 2f;
         [SerializeField] private Vector2 movementLimit = new Vector2(2f, 2f);
-        [SerializeField] private float movementRange = 5f;
         [SerializeField] private float movementSpeed = 10f;
         [SerializeField] private float smoothTime = 0.2f;
 
         [SerializeField] private float maxRoll;
         [SerializeField] private float rollSpeed = 2f;
         [SerializeField] private float rollDuration = 1f;
+
+        [SerializeField] private Transform modelParent;
+        [SerializeField] private float rotationSpeed = 5f;
         
         private Vector3 velocity;
         private float roll;
@@ -33,6 +37,24 @@ namespace RailShooter
 
         private void Update()
         {
+            HandlePosition();
+            HandleRoll();
+            HandleRotation();
+        }
+
+        private void HandleRotation()
+        {
+            // 确定朝向目标的方向
+            Vector3 direction = aimTarget.position - transform.position;
+            
+            // 计算看向目标所需的旋转
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            modelParent.rotation =
+                Quaternion.Lerp(modelParent.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+        }
+
+        private void HandlePosition()
+        {
             // 将玩家放置在目标后方指定距离处
             Vector3 targetPos = followTarget.position + followTarget.forward * -followDistance;
             
@@ -41,8 +63,8 @@ namespace RailShooter
             
             // 将平滑后的世界坐标转换为相对于跟随目标的局部坐标
             Vector3 localPos = transform.InverseTransformPoint(smoothedPos);
-            localPos.x += input.Move.x * movementSpeed * Time.deltaTime * movementRange;
-            localPos.y += input.Move.y * movementSpeed * Time.deltaTime * movementRange;
+            localPos.x += input.Move.x * movementSpeed * Time.deltaTime;
+            localPos.y += input.Move.y * movementSpeed * Time.deltaTime;
             
             // 确保玩家不会移出指定的移动范围
             localPos.x = Mathf.Clamp(localPos.x, -movementLimit.x, movementLimit.x);
@@ -50,7 +72,10 @@ namespace RailShooter
             
             // 将限制后的局部坐标转换回世界坐标
             transform.position = transform.TransformPoint(localPos);
-            
+        }
+
+        private void HandleRoll()
+        {
             // 将玩家旋转与跟随目标的旋转对齐
             transform.rotation = followTarget.rotation;
             
