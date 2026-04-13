@@ -1,5 +1,4 @@
-﻿using System;
-using KBCore.Refs;
+﻿using KBCore.Refs;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -17,10 +16,11 @@ namespace RailShooter
             get => flightPath;
             set => flightPath = value;
         }
-        
+
         private void Update()
         {
-            if (splineAnimate != null && splineAnimate.ElapsedTime >= splineAnimate.Duration)
+            if (splineAnimate != null && splineAnimate.Duration > 0f &&
+                splineAnimate.ElapsedTime >= splineAnimate.Duration)
             {
                 Destroy(gameObject);
             }
@@ -28,7 +28,10 @@ namespace RailShooter
 
         private void OnTriggerEnter(Collider other)
         {
+            if (other.gameObject.layer != LayerMask.NameToLayer("Projectile")) return;
+
             var explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            Destroy(other.gameObject);
             Destroy(gameObject);
             Destroy(explosion, 5f);
         }

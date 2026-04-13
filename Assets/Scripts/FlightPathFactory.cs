@@ -5,36 +5,28 @@ namespace RailShooter
 {
     public static class FlightPathFactory
     {
-        public static SplineContainer GenerateFlightPath(Annulus[] annuli)
+        // parent 必传：轨道在该父节点局部空间生成
+        public static SplineContainer GenerateFlightPath(Annulus[] annuli, Transform parent)
         {
-            Vector3[] pathPoints = new Vector3[annuli.Length];
-
-            for (int i = 0; i < annuli.Length; i++)
+            var flightPath = new GameObject("Flight Path");
+            if (parent != null)
             {
-                pathPoints[i] = annuli[i].GetRandomPoint();
+                flightPath.transform.SetParent(parent, false);
+                flightPath.transform.localPosition = Vector3.zero;
+                flightPath.transform.localRotation = Quaternion.identity;
             }
-
-            return CreateFlightPath(pathPoints);
-        }
-
-        private static SplineContainer CreateFlightPath(Vector3[] pathPoints)
-        {
-            GameObject flightPath = new GameObject("Flight Path");
 
             var container = flightPath.AddComponent<SplineContainer>();
             var spline = container.AddSpline();
-            var knots = new BezierKnot[pathPoints.Length];
 
-            for (int i = 0; i < pathPoints.Length; i++)
+            var knots = new BezierKnot[annuli.Length];
+            for (int i = 0; i < annuli.Length; i++)
             {
-                knots[i] = new BezierKnot(
-                    pathPoints[i],
-                    -30 * Vector3.forward,
-                    30 * Vector3.forward);
+                Vector3 localPoint = annuli[i].GetRandomPoint();
+                knots[i] = new BezierKnot(localPoint, -30 * Vector3.forward, 30 * Vector3.forward);
             }
 
             spline.Knots = knots;
-
             return container;
         }
     }

@@ -98,6 +98,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RailShooter.Enemy
   splineAnimate: {fileID: 239496960890804385}
   explosionPrefab: {fileID: 9155945149206610656, guid: 9d80aa0bb1a0bf742a0ea6c130d78767, type: 3}
+  projectileTag: PlayerProjectile
 --- !u!114 &239496960890804385
 MonoBehaviour:
   m_ObjectHideFlags: 0

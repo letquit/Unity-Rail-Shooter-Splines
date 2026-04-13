@@ -41,7 +41,7 @@ namespace RailShooter
 
         private void SpawnEnemy()
         {
-            var flightPath = FlightPathFactory.GenerateFlightPath(annuli);
+            var flightPath = FlightPathFactory.GenerateFlightPath(annuli, flightPathParent);
             EnemyFactory.GenerateEnemy(enemyPrefab, flightPath, enemyParent, flightPathParent);
         }
     }
